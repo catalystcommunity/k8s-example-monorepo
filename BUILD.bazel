@@ -1,0 +1,4 @@
+load("@gazelle//:def.bzl", "gazelle")
+
+# default gazelle run to update all BUILD files
+gazelle(name = "gazelle")

@@ -26,6 +26,53 @@ At the very least we want this to have some options for common production enviro
 
 Deployment options will likely be based on helm.
 
+## Bazel
+
+To build and test the entire project, run the following commands:
+
+```shell
+bazel build //...
+bazel test //...
+```
+
+### Gazelle
+
+We are using Gazelle to manage the BUILD files in the project. Gazelle is a tool that will generate BUILD files for
+Bazel from the source code. This is to ensure that the BUILD files are up to date with the source code, and that we
+don't have to manually manage the BUILD files. To update dependencies and BUILD files, run the following commands:
+
+```shell
+bazel run //:gazelle
+bazel mod tidy
+```
+
+### Bazelisk
+
+We are using Bazel for building and testing. The specific bazel version and setup is managed by `bazelisk`, which is a
+wrapper around bazel that will download the correct version for the project. This is to ensure that everyone is using 
+the same version of bazel, and that we can update the version without breaking everyone's build.
+https://github.com/bazelbuild/bazelisk?tab=readme-ov-file#installation
+
+Bazelisk is controlled by the `.bazelversion` file in the root of the project. To update the version of bazel, update 
+the `.bazelversion`, and the next time you run bazel, it will download the new version. In `.bazeliskrc` we have set
+a wrapper around the core bazel command to use [Aspect CLI](https://docs.aspect.build/cli/) (https://github.com/aspect-build/aspect-cli).
+Aspect CLI adds some convenience functions, plus an extensible plugin system if we need to add more functionality.
+
+### .bazelrc
+
+We have a `.bazelrc` file that sets up some defaults for the project. This is to ensure that everyone is using the 
+same settings for building and testing. We are using [opinionated presets from Aspect](https://docs.aspect.build/guides/bazelrc) 
+to manage these settings. The presets are stored in the `.aspect/bazelrc` directory. `bazel test //...` enforces that
+those files match the versioned presets. To update the presets, run the following command:
+
+```shell
+bazel run //.aspect/bazelrc:update_aspect_bazelrc_presets
+```
+
+If you want persistent personal settings that are not shared with the project, you can create a `.user.bazelrc` file
+in the root of the project. This gitignored file will be included after the `.bazelrc` file, and can be used to 
+override any settings that you need to change.
+
 ## Contributing
 
 For now, outside contributors need to talk to TodPunk in the Catalyst Community Discord or the [Forge Utah Slack](https://forgeutah.tech) and we may have guides for more self-service options later.
