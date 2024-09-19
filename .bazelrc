@@ -1,0 +1,32 @@
+# Import Aspect bazelrc presets
+# https://docs.aspect.build/guides/bazelrc
+import %workspace%/.aspect/bazelrc/bazel7.bazelrc
+import %workspace%/.aspect/bazelrc/convenience.bazelrc
+import %workspace%/.aspect/bazelrc/correctness.bazelrc
+import %workspace%/.aspect/bazelrc/debug.bazelrc
+import %workspace%/.aspect/bazelrc/javascript.bazelrc
+import %workspace%/.aspect/bazelrc/performance.bazelrc
+
+### YOUR PROJECT SPECIFIC OPTIONS GO HERE ###
+
+# build standalone (static) go_binaries without cgo support (pure) by default
+build --@rules_go//go/config:pure
+build --@rules_go//go/config:static
+
+# override aspect suggestion. Go tests are typically too fast and trigger this warning, which is just noisy
+test --notest_verbose_timeout_warnings
+
+# Don't allow network access for test actions in the sandbox.
+# Ensures that you don't accidentally make non-hermetic actions/tests which depend on remote services.
+# Developers should tag targets with `tags=["requires-network"]` to opt-out of the enforcement.
+# Docs: https://bazel.build/reference/command-line-reference#flag--sandbox_default_allow_network
+test --sandbox_default_allow_network=false
+
+# Show detailed test summaries for all tests.
+test --test_summary=detailed
+
+# Load any settings & overrides specific to the current user from `.aspect/bazelrc/user.bazelrc`.
+# This file should appear in `.gitignore` so that settings are not shared with team members. This
+# should be last statement in this config so the user configuration is able to overwrite flags from
+# this file. See https://bazel.build/configure/best-practices#bazelrc-file.
+try-import %workspace%/.aspect/bazelrc/user.bazelrc
