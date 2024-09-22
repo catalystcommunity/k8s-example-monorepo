@@ -1,0 +1,11 @@
+[project]
+name = "auth-api"
+version = "0.1.0"
+description = "The authn/authz API for the k8s-monorepo-example project in catalystcommunity"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115.0",
+    "sqlalchemy>=2.0.35",
+    "uvicorn>=0.30.6",
+]
