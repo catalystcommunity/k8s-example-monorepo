@@ -1,0 +1,9 @@
+auth:
+  enabled: true # enabled by default
+  prometheus:
+    enabled: false
+  resources: {}
+
+postgres:
+  uri: postgresql://devuser:devpass@monodemopg:5432?sslmode=disable
+
