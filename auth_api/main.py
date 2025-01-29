@@ -1,13 +1,12 @@
-from fastapi import FastAPI
+import uvicorn
+
+from auth.config import Config
+from auth.handlers import App
 
 
-app = FastAPI()
+def main():
+    uvicorn.run(App, port=Config.port)
 
 
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
-
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

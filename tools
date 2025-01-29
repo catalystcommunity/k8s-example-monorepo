@@ -13,17 +13,36 @@ NC=$'\e[0m'
 
 # Modify for the help message
 usage() {
+    log_status "Usage"
     echo "${THISSCRIPT} command"
     echo ""
     echo "Commands:"
     echo ""
     echo "  setup       Set things up, obviously"
+    echo "  updatedb    Get the DB up to latest. Make sure it is running and your env vars are set"
     echo ""
     exit 0
 }
 
 setup(){
-    echo "This is where we'll set things up if needs be" 
+    if ! command -v go 2>&1 >/dev/null
+    then
+        echo "Go is not installed, you'll have to do that first yourself"
+        exit 1
+    fi
+    go install github.com/pressly/goose/v3/cmd/goose@latest
+}
+
+updatedb(){
+    if ! command -v goose 2>&1 >/dev/null
+    then
+        echo "goose could not be found, running setup"
+        setup
+    fi
+
+    cd "${PROJECT_ROOT_DIR}/coredb"
+    goose up
+    cd -
 }
 
 log_status() {
@@ -35,6 +54,14 @@ case "$1" in
     "setup")
         shift
         setup "$@"
+        ;;
+    "updatedb")
+        shift
+        updatedb "$@"
+        ;;
+    "runauth")
+        shift
+        runauth "$@"
         ;;
     *)
         usage

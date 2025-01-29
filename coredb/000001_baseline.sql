@@ -17,13 +17,23 @@ CREATE TYPE user_role AS ENUM ('user', 'support', 'admin');
 create table users
 (
     id         uuid      default generate_ulid() not null primary key,
-    created_at timestamp default now() not null,
-    updated_at timestamp default now() not null,
+    created_at timestamp default timezone('utc', now()) not null,
+    updated_at timestamp default timezone('utc', now()) not null,
     username   text not null,
     email      text not null,
     password   bytea not null,
     salt       bytea not null,
     roles      user_role[] default ARRAY['user'::user_role] not null
+);
+
+-- Sessions are used to track logins
+create table sessions
+(
+    id         uuid      default generate_ulid() not null primary key,
+    user_id    uuid not null references users
+    created_at timestamp default timezone('utc', now()) not null,
+    updated_at timestamp default timezone('utc', now()) not null,
+    token      text not null,
 );
 
 -- These are what "thing" is being borrowed, so we could add "car" or something
@@ -33,8 +43,8 @@ create table thing_types
     -- Technically using an int primary key would be faster, and this will be a limited table
     -- but we want consistency over performance here
     id               uuid      default generate_ulid() not null primary key,
-    created_at       timestamp default now(),
-    updated_at       timestamp default now(),
+    created_at       timestamp default timezone('utc', now()) not null,
+    updated_at       timestamp default timezone('utc', now()) not null,
     name             text not null,
     description      text -- We don't need a description, that's a nice to have option
 );
@@ -42,8 +52,8 @@ create table thing_types
 create table owned_things
 (
     id               uuid      default generate_ulid() not null primary key,
-    created_at       timestamp default now(),
-    updated_at       timestamp default now(),
+    created_at       timestamp default timezone('utc', now()) not null,
+    updated_at       timestamp default timezone('utc', now()) not null,
     name             text,
     thing_type       uuid not null references thing_types on delete cascade,
     owner            uuid not null references users
@@ -53,10 +63,10 @@ create table owned_things
 create table borrows 
 (
     id               uuid      default generate_ulid() not null primary key,
-    created_at       timestamp default now(),
-    updated_at       timestamp default now(),
+    created_at       timestamp default timezone('utc', now()) not null,
+    updated_at       timestamp default timezone('utc', now()) not null,
     borrower         uuid not null references users,
-    borrowed_at      timestamp default now(),
+    borrowed_at      timestamp default timezone('utc', now()),
     borrowed_until   timestamp,
     returned_at      timestamp,
     reposessed       boolean default false

@@ -1,0 +1,79 @@
+apiVersion: skaffold/v4beta11
+kind: Config
+build:
+  artifacts:
+    - image: skaffold-monodemo-auth
+      context: auth_api/
+deploy:
+  helm:
+    hooks:
+      before:
+        - host:
+            command:
+              - sh
+              - -c
+              - helm repo add bitnami https://charts.bitnami.com/bitnami && helm repo add catalystcommunity https://raw.githubusercontent.com/catalystcommunity/charts/main
+    releases:
+      - name: monodemo
+        chartPath: ./helm_chart
+        namespace: skaffoldmonodemo
+        createNamespace: true
+        skipBuildDependencies: true
+        valuesFiles:
+          - values-skaffold-local.yaml
+        recreatePods: true
+        wait: true
+portForward:
+  # pf for postgresdb
+  - resourceType: service
+    resourceName: monodemo-postgresql
+    namespace: skaffoldmonodemo
+    port: 5432
+    localPort: 5432
+  # pf for grpc server
+  - resourceType: service
+    resourceName: monodemo-auth
+    namespace: skaffoldmonodemo
+    port: 5080
+    localPort: 5080
+  # pf for prometheus metrics
+  - resourceType: service
+    resourceName: monodemo-auth
+    namespace: skaffoldmonodemo
+    port: 9000
+    localPort: 9000
+profiles:
+  - name: no-api
+    patches:
+      # disable the auth api deployment, so that consumers don't conflict with a
+      # locally running version of the auth api
+      - op: add
+        path: /deploy/helm/releases/0/setValues
+        value:
+          deploymentEnabled: false
+          autoscaling.enabled: false
+      - op: remove
+        path: /portForward/1
+      - op: remove
+        path: /portForward/1
+  # test profile that will deploy the app into a "test" namespace. this is
+  # useful locally when you want to run tests, but don't want the tests to blow
+  # away your local persistent storage.
+  # usage:
+  #
+  #   skaffold dev --profile test
+  #
+  - name: test
+    patches:
+      - op: replace
+        path: /deploy/helm/releases/0/namespace
+        value: monodemotest
+      - op: replace
+        path: /portForward/0/namespace
+        value: test
+      - op: replace
+        path: /portForward/1/namespace
+        value: test
+      - op: replace
+        path: /portForward/2/namespace
+        value: test
