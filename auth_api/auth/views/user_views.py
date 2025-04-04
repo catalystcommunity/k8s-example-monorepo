@@ -5,13 +5,17 @@ from uuid import uuid4
 
 from fastapi import Body, APIRouter, Request, Response
 from email_validator import validate_email, EmailNotValidError
+from sqlalchemy.orm import Session as SQLSession
 
-from auth.models import Session, User
+from auth.models import SessionORM, UserORM, UserRole, Session, UserResponse
 from auth.passwords import hash_password
 from auth.error_dict import error_dict
 
 # Sphinx doc stuff
-from auth.db import dict_from_row
+from auth.db import dict_from_row, orm_to_pydantic
+
+# Alias for backward compatibility
+User = UserORM
 
 usersRouter = APIRouter(prefix='/api', tags=['users'])
 removals = ['password', 'salt']
@@ -37,10 +41,13 @@ def username_in_use(username, dbsession):
     :param dbsession: a db session
     :return: True if a username exists, otherwise False
     """
-    exists = (
-        dbsession.query(User).filter(User.username == username.lower()).one_or_none()
-    )
-    return exists is not None
+    # Check if we have a valid session
+    if not isinstance(dbsession, SQLSession):
+        return False
+
+    # Use classic SQLAlchemy query approach for compatibility
+    user = dbsession.query(UserORM).filter_by(username=username.lower()).first()
+    return user is not None
 
 
 @usersRouter.post('/users')
@@ -76,22 +83,25 @@ async def users_post_view(request: Request, response: Response):
             )
         }
 
-    user = User()
+    user = UserORM()
     user.salt = os.urandom(256)
     user.password = hash_password(json_body['password'], user.salt)
     user.username = json_body['username'].lower()
     user.email = json_body['email'].lower()
+    user.roles = [UserRole.user]
 
     request.state.dbsession.add(user)
     request.state.dbsession.flush()
     request.state.dbsession.refresh(user)
 
-    s = Session()
-    s.owner = user.id
+    s = SessionORM()
+    s.user_id = user.user_id
     s.token = str(uuid4())
     request.state.dbsession.add(s)
     request.state.dbsession.flush()
     request.state.dbsession.refresh(s)
+
+    # Create response using the data access functions
     result = dict_from_row(user, remove_fields=removals)
     result['session'] = dict_from_row(s, remove_fields=removals)
 
@@ -154,7 +164,7 @@ async def user_id_put_view(request: Request, response: Response):
         return {'d': error_dict('api_errors', 'not authenticated for this request')}
     if (
         not request.matchdict.get('user_id')
-        or int(request.matchdict.get('user_id')) != request.state.user.id
+        or int(request.matchdict.get('user_id')) != request.state.user.user_id
     ):
         response.status_code = 400
         return {'d': error_dict('api_errors', 'not authenticated for this request')}

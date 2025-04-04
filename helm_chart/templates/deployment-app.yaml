@@ -1,0 +1,97 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "app.fullname" . }}
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "app.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "app.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "app.serviceAccountName" . }}
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: zone
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            name: {{ include "app.fullname" . }}
+      - maxSkew: 1
+        topologyKey: node
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            name: {{ include "app.fullname" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.app.image.repository }}:{{ .Values.app.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.app.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.app.service.port }}
+              protocol: TCP
+            {{- if .Values.app.prometheus.enabled }}
+            - name: prometheus
+              port: {{ .Values.app.prometheus.port }}
+              protocol: TCP
+            {{ end }}
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+          resources:
+            {{- toYaml .Values.app.resources | nindent 12 }}
+          env:
+            - name: GRPC_MAX_MSG_SIZE_BYTES
+              value: {{ .Values.grpc.maxMessageSizeBytes | quote }}
+            - name: PORT
+              value: {{ .Values.app.service.port | quote }}
+            - name: PROMETHEUS_ENABLED
+              value: {{ .Values.app.prometheus.enabled | quote }}
+            - name: PROMETHEUS_PATH
+              value: {{ .Values.app.prometheus.path }}
+            - name: PROMETHEUS_PORT
+              value: {{ .Values.app.prometheus.port | quote }}
+            - name: PROMETHEUS_LATENCY_HISTOGRAMS_ENABLED
+              value: {{ .Values.app.prometheus.latencyHistogramsEnabled | quote }}
+            - name: DB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "app.secretName" . }}
+                  key: DB_URI
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

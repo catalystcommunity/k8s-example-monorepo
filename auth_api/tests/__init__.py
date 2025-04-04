@@ -1,13 +1,11 @@
 import os
-
-from unittest import TestCase
+import asyncio
 from datetime import datetime
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, scoped_session
+from unittest import TestCase
 
-from tests.datautils import DataUtils
 from auth.config import Config
 from auth.db import session_factory
+from tests.datautils import DataUtils
 
 
 def get_type_array():
@@ -35,6 +33,24 @@ bad_data_typevals_list = [
 
 engine = None
 Session = None
+
+
+def run_coroutine(coroutine):
+    """
+    Helper function to run a coroutine synchronously.
+    This allows us to test async code without using async fixtures.
+
+    Args:
+        coroutine: The coroutine to run
+
+    Returns:
+        The result of the coroutine
+    """
+    loop = asyncio.new_event_loop()
+    try:
+        return loop.run_until_complete(coroutine)
+    finally:
+        loop.close()
 
 
 class TestBase(TestCase):

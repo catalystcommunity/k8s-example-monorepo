@@ -1,15 +1,19 @@
-from sqlmodel import Session
+from sqlalchemy.orm import sessionmaker, Session
 from starlette.middleware.base import BaseHTTPMiddleware
 from fastapi import Request
-from sqlalchemy.orm import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import (
     Engine,
     create_engine,
 )
+from typing import Dict, Any, List, Type, Optional, TypeVar, Union
 
 from auth.config import Config
-from auth.logging import auth_logger
+from auth.logger import auth_logger
+from auth.models import Base, UserORM, SessionORM
+
+# Type variable for model conversion functions
+T = TypeVar('T')
 
 
 # This section is core db connection and session handling
@@ -89,11 +93,82 @@ class TransactionMiddleware(BaseHTTPMiddleware):
 # This section contains db conversion utilities for use in view handling
 
 
+def orm_to_dict(
+    orm_model: Base, exclude_fields: Optional[List[str]] = None
+) -> Dict[str, Any]:
+    """
+    Convert an SQLAlchemy ORM model to a dictionary
+
+    Args:
+        orm_model: SQLAlchemy ORM model instance
+        exclude_fields: Optional list of field names to exclude
+
+    Returns:
+        Dictionary representation of the model
+    """
+    if exclude_fields is None:
+        exclude_fields = []
+
+    # Special handling for password and salt fields - always exclude them
+    if hasattr(orm_model, 'password') and 'password' not in exclude_fields:
+        exclude_fields.append('password')
+    if hasattr(orm_model, 'salt') and 'salt' not in exclude_fields:
+        exclude_fields.append('salt')
+
+    result = {}
+    for column in orm_model.__table__.columns:
+        if column.name not in exclude_fields:
+            result[column.name] = getattr(orm_model, column.name)
+
+    return result
+
+
+def orm_to_pydantic(orm_model: Base, pydantic_model: Type[T]) -> T:
+    """
+    Convert an SQLAlchemy ORM model to a Pydantic model
+
+    Args:
+        orm_model: SQLAlchemy ORM model instance
+        pydantic_model: Pydantic model class
+
+    Returns:
+        Instance of the Pydantic model
+    """
+    # Convert ORM model to dict first, then to Pydantic model
+    model_dict = orm_to_dict(orm_model)
+    return pydantic_model.model_validate(model_dict)
+
+
+def dict_to_orm(model_dict: Dict[str, Any], orm_class: Type[Base]) -> Base:
+    """
+    Convert a dictionary to an SQLAlchemy ORM model
+
+    Args:
+        model_dict: Dictionary containing model data
+        orm_class: SQLAlchemy ORM model class
+
+    Returns:
+        Instance of the ORM model
+    """
+    orm_instance = orm_class()
+
+    # Copy values from dict to ORM instance
+    for column in orm_instance.__table__.columns:
+        if column.name in model_dict:
+            setattr(orm_instance, column.name, model_dict[column.name])
+
+    return orm_instance
+
+
 def make_set_of_field_names(field_names=None):
     """
+    Utility to normalize field names
 
-    :param field_names:
-    :return:
+    Args:
+        field_names: Field names as string, list, or attributes with keys
+
+    Returns:
+        List of field name strings
     """
     if field_names:
         field_names = (
@@ -121,6 +196,13 @@ def dict_from_row(row, remove_fields=None, sub_values=None):
     :param sub_values: A list of fields to be further loaded into the return dict, only if present as column names
     :return: A dictionary representation of all the non-private attributes of the row given
     """
+    # For compatibility with new code, use orm_to_dict if possible
+    if hasattr(row, '__table__'):
+        # Convert remove_fields to a list of strings
+        exclude = make_set_of_field_names(remove_fields) if remove_fields else []
+        return orm_to_dict(row, exclude)
+
+    # Fall back to old implementation for non-SQLAlchemy objects
     retdict = {}
     remove_fields = make_set_of_field_names(remove_fields)
     sub_values = make_set_of_field_names(sub_values)
