@@ -1,0 +1,23 @@
+# This file lists targets that can be built with Bazel.
+#
+# Each target is declared with a rule (like go_library) and is described
+# by a set of attributes like srcs and importpath.
+load("@rules_go//go:def.bzl", "go_binary", "go_library")
+
+go_library(
+    name = "app_api_lib",
+    srcs = ["main.go"],
+    importpath = "github.com/catalystcommunity/k8s-example-monorepo/app_api",
+    visibility = ["//visibility:private"],
+    deps = [
+        "//app_api/cmd",
+        "@com_github_catalystcommunity_app_utils_go//logging",
+        "@com_github_urfave_cli_v2//:cli",
+    ],
+)
+
+go_binary(
+    name = "app_api",
+    embed = [":app_api_lib"],
+    visibility = ["//visibility:public"],
+)

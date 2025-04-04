@@ -1,0 +1,13 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "checkauth",
+    srcs = ["checkauth.go"],
+    importpath = "github.com/catalystcommunity/k8s-example-monorepo/app_api/internal/checkauth",
+    visibility = ["//app_api:__subpackages__"],
+    deps = [
+        "//app_api/internal/store",
+        "//app_api/internal/store/models",
+        "//app_api/internal/store/postgres_store",
+    ],
+)

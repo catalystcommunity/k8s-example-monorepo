@@ -1,0 +1,9 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "utils",
+    srcs = ["password.go"],
+    importpath = "github.com/catalystcommunity/k8s-example-monorepo/app_api/internal/utils",
+    visibility = ["//app_api:__subpackages__"],
+    deps = ["@org_golang_x_crypto//pbkdf2"],
+)

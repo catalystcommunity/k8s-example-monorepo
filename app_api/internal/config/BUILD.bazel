@@ -1,0 +1,9 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "config",
+    srcs = ["config.go"],
+    importpath = "github.com/catalystcommunity/k8s-example-monorepo/app_api/internal/config",
+    visibility = ["//app_api:__subpackages__"],
+    deps = ["@com_github_catalystcommunity_app_utils_go//env"],
+)

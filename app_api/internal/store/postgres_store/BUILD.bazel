@@ -1,0 +1,25 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "postgres_store",
+    srcs = [
+        "borrow_operations.go",
+        "owned_thing_operations.go",
+        "postgres_store.go",
+        "thing_type_operations.go",
+    ],
+    importpath = "github.com/catalystcommunity/k8s-example-monorepo/app_api/internal/store/postgres_store",
+    visibility = ["//app_api:__subpackages__"],
+    deps = [
+        "//app_api/internal/config",
+        "//app_api/internal/store",
+        "//app_api/internal/store/models",
+        "@com_github_catalystcommunity_app_utils_go//env",
+        "@com_github_jackc_pgx_v4//log/logrusadapter",
+        "@com_github_jackc_pgx_v4//pgxpool",
+        "@com_github_sirupsen_logrus//:logrus",
+        "@io_gorm_driver_postgres//:postgres",
+        "@io_gorm_gorm//:gorm",
+        "@io_gorm_gorm//logger",
+    ],
+)

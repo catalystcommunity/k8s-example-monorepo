@@ -1,0 +1,15 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "store",
+    srcs = [
+        "store_interface.go",
+        "store_types.go",
+    ],
+    importpath = "github.com/catalystcommunity/k8s-example-monorepo/app_api/internal/store",
+    visibility = ["//app_api:__subpackages__"],
+    deps = [
+        "//app_api/internal/store/models",
+        "@io_gorm_gorm//:gorm",
+    ],
+)
