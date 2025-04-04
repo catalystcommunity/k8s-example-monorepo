@@ -1,6 +1,6 @@
 module github.com/catalystcommunity/k8s-example-monorepo/app_api
 
-go 1.23.1
+go 1.23.4
 
 require (
 	github.com/brianvoe/gofakeit/v6 v6.28.0

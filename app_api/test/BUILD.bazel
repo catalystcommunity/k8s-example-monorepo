@@ -1,0 +1,50 @@
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "test",
+    srcs = [
+        "auth_test_utils.go",
+        "datautils.go",
+        "test_utils.go",
+    ],
+    importpath = "github.com/catalystcommunity/k8s-example-monorepo/app_api/test",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//app_api/internal/checkauth",
+        "//app_api/internal/config",
+        "//app_api/internal/handlers",
+        "//app_api/internal/store",
+        "//app_api/internal/store/models",
+        "//app_api/internal/store/postgres_store",
+        "@com_github_brianvoe_gofakeit_v6//:gofakeit",
+        "@com_github_lib_pq//:pq",
+        "@io_gorm_driver_postgres//:postgres",
+        "@io_gorm_gorm//:gorm",
+    ],
+)
+
+go_test(
+    name = "test_test",
+    srcs = [
+        "datautils_new_test.go",
+        "debug_auth_test.go",
+        "owned_thing_handler_test.go",
+        "setup_test.go",
+        "thing_type_handler_test.go",
+        "transaction_test.go",
+        "verification_test.go",
+    ],
+    embed = [":test"],
+    deps = [
+        "//app_api/cmd",
+        "//app_api/internal/checkauth",
+        "//app_api/internal/config",
+        "//app_api/internal/handlers",
+        "//app_api/internal/store",
+        "//app_api/internal/store/models",
+        "//app_api/internal/store/postgres_store",
+        "@com_github_stretchr_testify//assert",
+        "@com_github_stretchr_testify//require",
+        "@io_gorm_gorm//:gorm",
+    ],
+)

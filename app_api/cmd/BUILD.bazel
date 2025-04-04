@@ -1,0 +1,28 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "cmd",
+    srcs = [
+        "api.go",
+        "health.go",
+        "migrate.go",
+        "serve.go",
+    ],
+    importpath = "github.com/catalystcommunity/k8s-example-monorepo/app_api/cmd",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//app_api/internal/config",
+        "//app_api/internal/handlers",
+        "//app_api/internal/store",
+        "//app_api/internal/store/postgres_store",
+        "//coredb",
+        "@com_github_catalystcommunity_app_utils_go//errorutils",
+        "@com_github_catalystcommunity_app_utils_go//logging",
+        "@com_github_gammazero_workerpool//:workerpool",
+        "@com_github_pressly_goose_v3//:goose",
+        "@com_github_sirupsen_logrus//:logrus",
+        "@com_github_urfave_cli_v2//:cli",
+        "@io_gorm_driver_postgres//:postgres",
+        "@io_gorm_gorm//:gorm",
+    ],
+)

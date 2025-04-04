@@ -1,0 +1,14 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "coredb",
+    srcs = ["main.go"],
+    embedsrcs = [
+        "migrations/000001_baseline.sql",
+        "migrations/000002_add_session_rotated.sql",
+        "migrations/000003_add_user_unique_constraints.sql",
+        "migrations/000004_add_thing_type_unique_constraint.sql",
+    ],
+    importpath = "github.com/catalystcommunity/k8s-example-monorepo/coredb",
+    visibility = ["//visibility:public"],
+)

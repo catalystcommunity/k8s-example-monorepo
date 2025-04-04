@@ -26,6 +26,12 @@ At the very least we want this to have some options for common production enviro
 
 Deployment options will likely be based on helm.
 
+## Running a test DB
+
+The easiest test DB scenario is just to use docker, though skaffold can also be used when we have it all setup with a `test` profile and it will forward pords from your local k8s cluster. The exact command for docker though:
+
+`docker run -d --rm --name postgres-test -e POSTGRES_USER=devuser -e POSTGRES_PASSWORD=devpass -e POSTGRES_DB=monodemopg -p 5432:5432 postgres:17`
+
 ## Bazel
 
 To build and test the entire project, run the following commands:
