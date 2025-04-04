@@ -1,4 +1,6 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Request, HTTPException
+from sqlalchemy import text
+import time
 
 baseRouter = APIRouter(prefix='/api', tags=['base'])
 
@@ -10,11 +12,45 @@ baseRouter = APIRouter(prefix='/api', tags=['base'])
 
 
 @baseRouter.get('/health')
-def health_view():
+def health_check(request: Request):
     """
-    For a generalized health check
+    Health check that verifies database connectivity by executing a lightweight query
+    that tests the connection without reading from tables.
+
+    This endpoint also returns the verification status if a token is provided.
     """
-    return {'status': 'OK'}
+    try:
+        # Get the database session from request state (added by TransactionMiddleware)
+        db = request.state.dbsession
+
+        # Execute the query to check database connectivity and uptime
+        result = db.execute(
+            text('SELECT current_timestamp - pg_postmaster_start_time() as uptime')
+        ).scalar()
+
+        # Convert to seconds for easier reading
+        uptime_seconds = result.total_seconds()
+
+        # Build response
+        response = {
+            'status': 'OK',
+            'database': {'connected': True, 'uptime_seconds': uptime_seconds},
+            'timestamp': time.time(),
+        }
+
+        # Add verification info if available
+        if hasattr(request.state, 'verified'):
+            response['verification'] = {
+                'verified': request.state.verified,
+                'user_authenticated': request.state.user is not None,
+            }
+
+        return response
+    except Exception as e:
+        # Log the error and return a 503 Service Unavailable
+        raise HTTPException(
+            status_code=503, detail=f'Database health check failed: {str(e)}'
+        )
 
 
 conn_err_msg = """\

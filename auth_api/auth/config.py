@@ -11,7 +11,7 @@ class _config:
 Config = _config()
 # Set properties for config either from environ, or from some file/function parsing stuff
 Config.db_url = os.environ.get(
-    'DB_URL', 'postgresql://devuser:devpass@localhost/monodemopg'
+    'DB_URI', 'postgresql://devuser:devpass@localhost/monodemopg'
 )
 Config.port = int(os.environ.get('PORT', '5080'))
 Config.base_domain = os.environ.get('BASE_DOMAIN', f'localhost:{Config.port}')

@@ -75,7 +75,7 @@ override any settings that you need to change.
 
 ## Contributing
 
-For now, outside contributors need to talk to TodPunk in the Catalyst Community Discord or the [Forge Utah Slack](https://forgeutah.tech) and we may have guides for more self-service options later.
+For now, outside contributors need to talk to TodPunk in the [Catalyst Community Discord](https://discord.gg/sfNb9xRjPn) or the [Forge Utah Slack](https://forgeutah.tech) and we may have guides for more self-service options later.
 
 ## License
 

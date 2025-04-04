@@ -1,18 +1,29 @@
-FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
+FROM python:3.13-slim-bookworm
 
-WORKDIR /workspace
+WORKDIR /app
 
-COPY ./pyproject.toml /workspace/pyproject.toml
-COPY ./uv.lock /workspace/uv.lock
+# The installer requires curl (and certificates) to download the release archive
+RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates
 
-RUN uv sync --frozen --no-install-project --no-dev
+# Download the latest installer
+ADD https://astral.sh/uv/install.sh /uv-installer.sh
 
-COPY ./ /workspace/
+# Run the installer then remove it
+RUN sh /uv-installer.sh && rm /uv-installer.sh
 
-# Place executables in the environment at the front of the path
-ENV PATH="/workspace/.venv/bin:$PATH"
+RUN apt-get clean -y && apt-get remove -y --autoremove curl
 
-# Reset the entrypoint, don't invoke `uv`
-ENTRYPOINT []
+# Ensure the installed binary is on the `PATH`
+ENV PATH="/root/.local/bin/:$PATH"
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
+# Copy requirements first for better caching
+COPY pyproject.toml uv.lock /app/
+
+# Sync the project into a new environment, using the frozen lockfile
+RUN uv sync --frozen
+
+# Copy the project into the image
+ADD . /app
+
+ENTRYPOINT ["uv", "run", "main.py"]
+CMD ["uv", "run", "main.py"]

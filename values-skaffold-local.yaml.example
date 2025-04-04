@@ -5,5 +5,11 @@ auth:
   resources: {}
 
 postgres:
-  uri: postgresql://devuser:devpass@monodemopg:5432?sslmode=disable
+  enabled: true
+  uri: postgresql://devuser:devpass@monodemo-postgresql:5432/monodemopg?sslmode=disable
 
+
+migrations:
+  # set the job name to be a timestamp, so that `skaffold dev` doesn't run into
+  # an issue when attempting to update the job
+  setJobNameAsTimestamp: true

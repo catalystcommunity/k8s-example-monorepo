@@ -250,3 +250,6 @@ values-skaffold-local.yaml
 *.tar.gz
 *.tar.bz
 *.tar
+
+
+app_api/app_api

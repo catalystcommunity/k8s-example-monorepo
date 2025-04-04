@@ -1,0 +1,30 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "app.migrateJobName" . }}
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+spec:
+  {{ if .Values.migrations.ttlSecondsAfterFinished -}}
+  ttlSecondsAfterFinished: {{ .Values.migrations.ttlSecondsAfterFinished }}
+  {{ end -}}
+  template:
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          args:
+            - migrate
+          securityContext:
+                  {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.app.image.repository }}:{{ .Values.app.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.app.image.pullPolicy }}
+          env:
+            - name: DB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "app.secretName" . }}
+                  key: DB_URI
+          resources:
+            {{- toYaml .Values.migrations.resources | nindent 12 }}
+      restartPolicy: {{ .Values.migrations.restartPolicy }}
+  backoffLimit: {{ .Values.migrations.backoffLimit }}

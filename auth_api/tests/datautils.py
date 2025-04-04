@@ -1,108 +1,140 @@
-import hashlib
-from copy import deepcopy
-from uuid import uuid4
+import os
+import uuid
 from random import randint
+from typing import Any
 
-from datetime import datetime
-from sqlalchemy import func
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session as SQLSession
 
-from auth.models import (
-    User,
-    Session,
-)
 from auth.db import sqlobj_from_dict
+from auth.models import (
+    SessionORM,
+    UserORM,
+    UserRole,
+)
+from auth.passwords import hash_password
+
+# Alias for backward compatibility
+User = UserORM
 
 
-def random_with_n_digits(n):
+def random_with_n_digits(n: int) -> int:
+    """Generate a random number with n digits"""
     range_start = 10 ** (n - 1)
     range_end = (10**n) - 1
     return randint(range_start, range_end)
 
 
-class DataUtils(object):
+class DataUtils:
     """
-    This class will handle creation of specific data types for default
-    records and will be reusable with a variety of tests and scenarios for
-    testing environment setup.  The goal is to make code more readable in a
-    test and get the data boilerplate out of the testing files for a given module,
-    so we can just focus on writing tests for that module, regardless of what
-    it might be.
+    This class handles creation of database objects for tests.
 
-    As an example, if one needs an object X, rather than defining methods of
-    creating the database objects, we can simply make the data in the test, and
-    let the redundant coding bits of dealing with the database be a function here.
+    It encapsulates the boilerplate of creating database records with sensible defaults
+    while allowing test-specific overrides. This makes tests more readable by focusing
+    on the test logic rather than data setup.
     """
 
-    def __init__(self, session: Session):
+    def __init__(self, session: SQLSession):
         """
-        Creation of basic state to handle all our data operations.
+        Initialize with a database session.
+
+        Args:
+            session: An SQLAlchemy session for database operations
         """
         self.session = session
 
-    def create_user(self, spec_data=None, return_object=True):
+    def create_user(
+        self, data: dict[str, Any] | None = None, return_object: bool = True
+    ) -> UserORM | uuid.UUID:
         """
-        Make a customer object, return the actual object with spec_data overriding values for further manipulation unless set to false.
-        :param spec_data: A dictionary containing the data keyed on db model object attribute
-        :param return_object: Whether to return the object or not, defaulting to True
-        :return: a customer db model
+        Create a user with default values that can be overridden.
+
+        Args:
+            data: Dictionary of attribute overrides
+            return_object: Whether to return the object or just the ID
+
+        Returns:
+            Either the User object or its ID
         """
-        u = User()
+        u = UserORM()
 
-        if spec_data is None:
-            spec_data = {}
-        sqlobj_from_dict(u, spec_data)
+        if data is None:
+            data = {}
 
-        if u.id is None:
-            u.id = self.session.query(func.nextval('users_id_seq')).scalar()
+        # Apply any provided values
+        sqlobj_from_dict(u, data)
+
+        # Set default values for required fields if not provided
         if u.username is None:
-            u.username = 'generated%d' % u.id
+            u.username = f'testuser_{str(uuid.uuid4())[:8]}'
+        else:
+            u.username = u.username.lower()
+
         if u.email is None:
-            u.email = 'Test%d@example.com' % u.id
+            u.email = f'{u.username}@example.com'
+        else:
+            u.email = u.email.lower()
+
+        # Generate random salt if not provided
         if u.salt is None:
-            u.salt = 'generated_salt%d' % u.id
+            u.salt = os.urandom(256)
+
+        # Hash password with PBKDF2 if provided as string
         if u.password is None:
-            u.password = 'generated_pass%d' % u.id
-        if u.infoemails is None:
-            u.infoemails = True
+            password_str = f'password_{str(uuid.uuid4())[:8]}'
+            u.password = hash_password(password_str, u.salt)
+        elif isinstance(u.password, str):
+            u.password = hash_password(u.password, u.salt)
 
-        if isinstance(u.salt, str):
-            s = hashlib.sha512()
-            s.update(u.salt.encode('utf-8'))
-            u.salt = s.digest()
-        if isinstance(u.password, str):
-            m = hashlib.sha512()
-            m.update(u.password.encode('utf-8'))
-            m.update(u.salt)
-            u.password = m.digest()
+        # Set default role if not provided
+        if u.roles is None or len(u.roles) == 0:
+            u.roles = [UserRole.user]
 
+        # Save to database
         self.session.add(u)
         self.session.flush()
         self.session.refresh(u)
+
         if return_object:
             return u
-        return u.id
+        return u.user_id
 
-    def create_session(self, spec_data=None, return_object=True):
+    def create_session(
+        self, data: dict[str, Any] | None = None, return_object: bool = True
+    ) -> SessionORM | uuid.UUID:
         """
-        Make a session object, return the actual object with spec_data overriding values for further manipulation unless set to false.
-        :param spec_data: A dictionary containing the data keyed on db model object attribute
-        :param return_object: Whether to return the object or not, defaulting to True
-        :return: a session db model
-        """
-        s = Session()
-        if spec_data is None:
-            spec_data = {}
-        sqlobj_from_dict(s, spec_data)
+        Create a session with default values that can be overridden.
 
+        Args:
+            data: Dictionary of attribute overrides
+            return_object: Whether to return the object or just the ID
+
+        Returns:
+            Either the Session object or its ID
+        """
+        s = SessionORM()
+        if data is None:
+            data = {}
+
+        # Apply any provided values
+        sqlobj_from_dict(s, data)
+
+        # Create user if not provided
         if s.user_id is None:
-            s.user_id = self.create_user(spec_data).id
-        if s.token is None:
-            s.token = uuid4()
+            user_data = {}
+            if 'user' in data:
+                user_data = data['user']
+            user = self.create_user(user_data)
+            s.user_id = user.user_id
 
+        # Generate token if not provided
+        if s.token is None:
+            s.token = str(uuid.uuid4())
+
+        # Save to database
         self.session.add(s)
         self.session.flush()
         self.session.refresh(s)
+
         if return_object:
             return s
-        return s.id
+        return s.session_id
