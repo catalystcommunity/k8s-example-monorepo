@@ -1,0 +1,19 @@
+load("@rules_python//python:defs.bzl", "py_library")
+
+py_library(
+    name = "auth_views",
+    srcs = [
+        "__init__.py",
+        "base_views.py",
+        "session_views.py",
+        "user_views.py",
+    ],
+    imports = ["../.."],
+    visibility = ["//auth_api:__subpackages__"],
+    deps = [
+        "//auth_api/auth/core:auth_core",
+        "@pip//email_validator",
+        "@pip//fastapi",
+        "@pip//sqlalchemy",
+    ],
+)

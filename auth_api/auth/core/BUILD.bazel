@@ -1,0 +1,26 @@
+load("@rules_python//python:defs.bzl", "py_library")
+
+py_library(
+    name = "auth_core",
+    srcs = [
+        "__init__.py",
+        "config.py",
+        "db.py",
+        "env.py",
+        "error_dict.py",
+        "logger.py",
+        "models.py",
+        "passwords.py",
+        "verification.py",
+    ],
+    imports = ["../.."],
+    visibility = ["//auth_api:__subpackages__"],
+    deps = [
+        "@pip//fastapi",
+        "@pip//psycopg2_binary",
+        "@pip//pydantic",
+        "@pip//python_json_logger",
+        "@pip//sqlalchemy",
+        "@pip//starlette",
+    ],
+)

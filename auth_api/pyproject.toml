@@ -13,10 +13,6 @@ dependencies = [
     "sqlalchemy>=2.0.35",
     "sqlmodel>=0.0.22",
     "uvicorn>=0.32.0",
-]
-
-[tool.uv]
-dev-dependencies = [
     "pytest<8.0.0,>=7.4.3",
     "mypy<2.0.0,>=1.8.0",
     "ruff<1.0.0,>=0.2.2",

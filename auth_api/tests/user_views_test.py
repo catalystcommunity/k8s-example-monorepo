@@ -6,7 +6,7 @@ import uuid
 
 from fastapi import Response
 
-from auth.models import UserORM, UserRole
+from auth.core.models import UserORM, UserRole
 from auth.views.user_views import users_post_view
 from tests import TestBase, run_coroutine
 from tests.test_utils import create_mock_request

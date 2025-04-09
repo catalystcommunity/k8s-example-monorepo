@@ -1,0 +1,63 @@
+# GENERATED FILE - DO NOT EDIT!
+#
+# To update this file, run:
+#   bazel run //auth_api:gazelle_python_manifest.update
+
+---
+manifest:
+  modules_mapping:
+    3204bda914b7f2c6f497__mypyc: mypy
+    alembic: alembic
+    alembic_postgresql_enum: alembic_postgresql_enum
+    annotated_types: annotated_types
+    anyio: anyio
+    certifi: certifi
+    cfgv: cfgv
+    click: click
+    coverage: coverage
+    distlib: distlib
+    dns: dnspython
+    email_validator: email_validator
+    fastapi: fastapi
+    filelock: filelock
+    greenlet: greenlet
+    h11: h11
+    httpcore: httpcore
+    httpx: httpx
+    identify: identify
+    idna: idna
+    iniconfig: iniconfig
+    mako: Mako
+    markupsafe: MarkupSafe
+    mypy: mypy
+    mypy_extensions: mypy_extensions
+    mypyc: mypy
+    nodeenv: nodeenv
+    packaging: packaging
+    pkg_resources: setuptools
+    platformdirs: platformdirs
+    pluggy: pluggy
+    pre_commit: pre_commit
+    psycopg2: psycopg2_binary
+    py: pytest
+    pydantic: pydantic
+    pydantic_core: pydantic_core
+    pytest: pytest
+    pytest_asyncio: pytest_asyncio
+    pythonjsonlogger: python_json_logger
+    ruff: ruff
+    setuptools: setuptools
+    sniffio: sniffio
+    sqlalchemy: sqlalchemy
+    sqlmodel: sqlmodel
+    starlette: starlette
+    transaction: transaction
+    typing_extensions: typing_extensions
+    typing_inspection: typing_inspection
+    uvicorn: uvicorn
+    virtualenv: virtualenv
+    yaml: PyYAML
+    zope.interface: zope.interface
+  pip_repository:
+    name: pip
+integrity: c2f9df1b6abcc34c50acbf9f839f7c174eb1d2133b3847bd61f2681209f6ce37

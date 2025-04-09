@@ -9,3 +9,7 @@ This sub-project should contain tests that use an actual postgres db but the onl
 If requirements needs updating, you have to regenerate the requirements_lock.txt for bazel using the following from inside this directory:
 
 `uv pip compile pyproject.toml -o ../requirements_lock.txt`
+
+followed by:
+
+`bazel run //auth_api:gazelle_python_manifest.update`

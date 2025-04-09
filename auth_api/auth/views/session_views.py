@@ -3,13 +3,13 @@ from datetime import datetime, timedelta
 from uuid import uuid4
 from fastapi import APIRouter, Request, Response, status
 
-from auth.models import SessionORM, UserORM
-from auth.error_dict import error_dict
-from auth.passwords import hash_password
-from auth.verification import generate_verifier
+from auth.core.models import SessionORM, UserORM
+from auth.core.error_dict import error_dict
+from auth.core.passwords import hash_password
+from auth.core.verification import generate_verifier
 
 # Sphinx doc stuff
-from auth.db import dict_from_row
+from auth.core.db import dict_from_row
 
 sessions_desc = """
 Work with sessions for user accounts
