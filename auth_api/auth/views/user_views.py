@@ -7,12 +7,12 @@ from fastapi import Body, APIRouter, Request, Response
 from email_validator import validate_email, EmailNotValidError
 from sqlalchemy.orm import Session as SQLSession
 
-from auth.models import SessionORM, UserORM, UserRole, Session, UserResponse
-from auth.passwords import hash_password
-from auth.error_dict import error_dict
+from auth.core.models import SessionORM, UserORM, UserRole, Session, UserResponse
+from auth.core.passwords import hash_password
+from auth.core.error_dict import error_dict
 
 # Sphinx doc stuff
-from auth.db import dict_from_row, orm_to_pydantic
+from auth.core.db import dict_from_row, orm_to_pydantic
 
 # Alias for backward compatibility
 User = UserORM

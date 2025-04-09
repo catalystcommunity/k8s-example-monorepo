@@ -5,8 +5,8 @@ from typing import Optional
 from fastapi import Request, Response, status
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from auth.error_dict import error_dict
-from auth.models import UserORM, SessionORM
+from auth.core.error_dict import error_dict
+from auth.core.models import UserORM, SessionORM
 
 
 def generate_verifier(user_id: str, salt: bytes, token: str) -> str:

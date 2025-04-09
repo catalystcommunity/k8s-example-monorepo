@@ -11,7 +11,7 @@ import transaction
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from auth.config import Config
+from auth.core.config import Config
 
 # Test database configuration - use the same as in config if available
 TEST_DB_URL = os.environ.get('TEST_DB_URL', Config.db_url)

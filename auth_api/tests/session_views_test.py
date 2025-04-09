@@ -8,7 +8,7 @@ from uuid import uuid4
 
 from fastapi import Response
 
-from auth.models import UserORM, SessionORM, UserRole
+from auth.core.models import UserORM, SessionORM, UserRole
 from auth.views.session_views import (
     sessions_post_view,
     sessions_delete_view,

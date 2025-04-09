@@ -5,13 +5,13 @@ from typing import Any
 
 from sqlalchemy.orm import Session as SQLSession
 
-from auth.db import sqlobj_from_dict
-from auth.models import (
+from auth.core.db import sqlobj_from_dict
+from auth.core.models import (
     SessionORM,
     UserORM,
     UserRole,
 )
-from auth.passwords import hash_password
+from auth.core.passwords import hash_password
 
 # Alias for backward compatibility
 User = UserORM

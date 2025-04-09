@@ -1,0 +1,8 @@
+# Python specific
+.venv
+__pycache__
+.pytest_cache
+auth_api.egg-info
+
+# Go specific
+app_api/app_api

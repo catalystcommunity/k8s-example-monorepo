@@ -1,6 +1,6 @@
 import os
 
-from auth.logger import auth_logger
+from auth.core.logger import auth_logger
 
 
 # Retrieves a value from the environment, or returns a default value if it is not set, or None if no default is provided.

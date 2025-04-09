@@ -5,8 +5,8 @@ Tests for token verification middleware functionality.
 import uuid
 from datetime import datetime
 
-from auth.verification import generate_verifier, verify_session
-from auth.models import SessionORM, UserORM
+from auth.core.verification import generate_verifier, verify_session
+from auth.core.models import SessionORM, UserORM
 from tests import TestBase, run_coroutine
 from tests.test_utils import create_mock_request
 

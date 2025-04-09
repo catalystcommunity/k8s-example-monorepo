@@ -8,9 +8,11 @@ from sqlalchemy import (
 )
 from typing import Dict, Any, List, Type, Optional, TypeVar, Union
 
-from auth.config import Config
-from auth.logger import auth_logger
-from auth.models import Base, UserORM, SessionORM
+from auth.core.config import Config
+from auth.core.logger import auth_logger
+from auth.core.models import Base, UserORM, SessionORM
+
+import psycopg2
 
 # Type variable for model conversion functions
 T = TypeVar('T')
