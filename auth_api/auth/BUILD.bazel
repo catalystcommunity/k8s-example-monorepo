@@ -2,7 +2,16 @@ load("@rules_python//python:defs.bzl", "py_library")
 
 py_library(
     name = "auth_auth",
-    srcs = ["__init__.py"],
+    srcs = [
+        "__init__.py",
+        "app.py",
+    ],
     imports = [".."],
     visibility = ["//auth_api:__subpackages__"],
+    deps = [
+        "//auth_api/auth/core:auth_core",
+        "//auth_api/auth/views:auth_views",
+        "@pip//fastapi",
+        "@pip//starlette",
+    ],
 )

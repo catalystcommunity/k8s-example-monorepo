@@ -1,8 +1,8 @@
 from fastapi.testclient import TestClient
 
-from auth import app
+from auth.app import App
 
-client = TestClient(app)
+client = TestClient(App)
 
 
 def test_health_endpoint():

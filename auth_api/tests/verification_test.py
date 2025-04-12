@@ -7,8 +7,7 @@ from datetime import datetime
 
 from auth.core.verification import generate_verifier, verify_session
 from auth.core.models import SessionORM, UserORM
-from tests import TestBase, run_coroutine
-from tests.test_utils import create_mock_request
+from tests.test_utils import create_mock_request, TestBase, run_coroutine
 
 
 class TestVerifier(TestBase):
