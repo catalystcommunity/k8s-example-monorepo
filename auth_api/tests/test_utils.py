@@ -4,6 +4,11 @@ Test utilities for auth_api tests.
 This module provides helper functions and classes for tests.
 """
 
+import asyncio
+import pytest
+from sqlalchemy.orm import Session as SQLSession
+
+from tests.datautils import DataUtils
 
 class MockRequest:
     """
@@ -71,3 +76,43 @@ def create_mock_request(
         request.headers = headers
 
     return request
+
+def run_coroutine(coroutine):
+    """
+    Run a coroutine synchronously.
+    
+    This is a helper function to run async functions in tests.
+    
+    Args:
+        coroutine: The coroutine to run
+        
+    Returns:
+        The result of the coroutine
+    """
+    loop = asyncio.get_event_loop()
+    return loop.run_until_complete(coroutine)
+
+
+class TestBase:
+    """
+    Base class for all auth_api tests.
+    
+    This class provides common functionality for tests, including:
+    - Database session management
+    - Data utilities for creating test objects
+    - Fixture setup and teardown
+    """
+    
+    @pytest.fixture(autouse=True)
+    def setup_test(self, db_session: SQLSession):
+        """
+        Set up test fixtures before each test.
+        
+        This fixture runs automatically for each test that inherits from TestBase.
+        It sets up the database session and initializes data utilities.
+        
+        Args:
+            db_session: The database session fixture
+        """
+        self.session = db_session
+        self.datautils = DataUtils(self.session)

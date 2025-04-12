@@ -67,13 +67,7 @@ Aspect CLI adds some convenience functions, plus an extensible plugin system if 
 ### .bazelrc
 
 We have a `.bazelrc` file that sets up some defaults for the project. This is to ensure that everyone is using the 
-same settings for building and testing. We are using [opinionated presets from Aspect](https://docs.aspect.build/guides/bazelrc) 
-to manage these settings. The presets are stored in the `.aspect/bazelrc` directory. `bazel test //...` enforces that
-those files match the versioned presets. To update the presets, run the following command:
-
-```shell
-bazel run //.aspect/bazelrc:update_aspect_bazelrc_presets
-```
+same settings for building and testing. These can evolve over time as we discover more constraints for consistent builds.
 
 If you want persistent personal settings that are not shared with the project, you can create a `.user.bazelrc` file
 in the root of the project. This gitignored file will be included after the `.bazelrc` file, and can be used to 

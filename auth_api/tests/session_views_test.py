@@ -15,8 +15,7 @@ from auth.views.session_views import (
     sessions_put_view,
     sessions_rotate_view,
 )
-from tests import TestBase, run_coroutine
-from tests.test_utils import create_mock_request
+from tests.test_utils import create_mock_request, TestBase, run_coroutine
 
 
 class TestSessionCreation(TestBase):

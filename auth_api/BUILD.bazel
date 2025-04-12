@@ -45,6 +45,7 @@ py_binary(
     visibility = ["//auth_api:__subpackages__"],
     deps = [
         "//auth_api/auth:auth_auth",
+        "//auth_api/auth/core:auth_core",
         "@pip//uvicorn",
     ],
 )
@@ -55,6 +56,7 @@ py_library(
     visibility = ["//auth_api:__subpackages__"],
     deps = [
         "//auth_api/auth:auth_auth",
+        "//auth_api/auth/core:auth_core",
         "@pip//uvicorn",
     ],
 )

@@ -19,11 +19,11 @@ py_test(
     srcs = ["session_views_test.py"],
     imports = [".."],
     deps = [
-        ":auth_tests",
         ":test_utils",
         "//auth_api/auth/core:auth_core",
         "//auth_api/auth/views:auth_views",
         "@pip//fastapi",
+        "@pip//psycopg2_binary",  #keep
     ],
 )
 
@@ -46,6 +46,7 @@ py_test(
     deps = [
         "//auth_api/auth:auth_auth",
         "@pip//fastapi",
+        "@pip//httpx",  # keep
     ],
 )
 
@@ -53,6 +54,11 @@ py_test(
     name = "test_utils",
     srcs = ["test_utils.py"],
     imports = [".."],
+    deps = [
+        ":auth_tests",  #keep
+        "@pip//pytest",
+        "@pip//sqlalchemy",
+    ],
 )
 
 py_test(
@@ -60,11 +66,11 @@ py_test(
     srcs = ["user_views_test.py"],
     imports = [".."],
     deps = [
-        ":auth_tests",
         ":test_utils",
         "//auth_api/auth/core:auth_core",
         "//auth_api/auth/views:auth_views",
         "@pip//fastapi",
+        "@pip//psycopg2_binary",  #keep
     ],
 )
 
@@ -73,11 +79,11 @@ py_test(
     srcs = ["verification_test.py"],
     imports = [".."],
     deps = [
-        ":auth_tests",
         ":test_utils",
         "//auth_api/auth:auth_auth",
         "//auth_api/auth/core:auth_core",
         "@pip//fastapi",
+        "@pip//psycopg2_binary",  #keep
         "@pip//sqlalchemy",
     ],
 )
