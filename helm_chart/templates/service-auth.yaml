@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "auth.fullname" . }}
+  name: {{ include "auth.name" . }}
   labels:
     {{- include "auth.labels" . | nindent 4 }}
 spec:

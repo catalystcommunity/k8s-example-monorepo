@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ include "app.migrateJobName" . }}
+  name: {{ .Values.migrations.jobName }}
   labels:
     {{- include "app.labels" . | nindent 4 }}
 spec:

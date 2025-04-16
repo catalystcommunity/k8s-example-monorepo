@@ -64,7 +64,7 @@ web:
     tag: ""
   service:
     type: LoadBalancer
-    port: 80
+    port: 4080
   apiUrl: "http://auth-api-service:5080"
   autoscaling:
     enabled: true
@@ -83,6 +83,11 @@ web:
     # requests:
     #   cpu: 100m
     #   memory: 128Mi
+
+migrations:
+  jobName: "migrations"
+  restartPolicy: "OnFailure"
+  resources: {}
 
 grpc:
   maxMessageSizeBytes: "1000000000"

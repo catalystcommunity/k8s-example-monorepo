@@ -1,11 +1,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "web.fullname" . }}
+  name: {{ include "web.name" . }}
   labels:
     {{- include "web.labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
+  {{- if not .Values.web.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
@@ -13,7 +13,7 @@ spec:
       {{- include "web.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
+      {{- with .Values.web.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -31,13 +31,13 @@ spec:
         whenUnsatisfiable: ScheduleAnyway
         labelSelector:
           matchLabels:
-            name: {{ include "web.fullname" . }}
+            name: {{ include "web.name" . }}
       - maxSkew: 1
         topologyKey: node
         whenUnsatisfiable: ScheduleAnyway
         labelSelector:
           matchLabels:
-            name: {{ include "web.fullname" . }}
+            name: {{ include "web.name" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:

@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "auth.fullname" . }}
+  name: {{ include "auth.name" . }}
   labels:
     {{- include "auth.labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
+  {{- if not .Values.auth.autoscaling.enabled }}
+  replicas: {{ .Values.auth.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
@@ -31,13 +31,13 @@ spec:
         whenUnsatisfiable: ScheduleAnyway
         labelSelector:
           matchLabels:
-            name: {{ include "auth.fullname" . }}
+            name: {{ include "auth.name" . }}
       - maxSkew: 1
         topologyKey: node
         whenUnsatisfiable: ScheduleAnyway
         labelSelector:
           matchLabels:
-            name: {{ include "auth.fullname" . }}
+            name: {{ include "auth.name" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
