@@ -5,7 +5,9 @@ build:
     - image: auth_api
       context: auth_api/
     - image: app_api
-      context: app_api/
+      context: .
+    - image: web_app
+      context: web_app/
   local:
     useDockerCLI: false
     useBuildkit: true
@@ -54,16 +56,22 @@ portForward:
     localPort: 9001
   # pf for app server
   - resourceType: service
-    resourceName: monodemo-app
+    resourceName: monodemo-api
     namespace: skaffoldmonodemo
     port: 6080
     localPort: 6080
   # pf for app prometheus metrics
   - resourceType: service
-    resourceName: monodemo-app
+    resourceName: monodemo-api
     namespace: skaffoldmonodemo
     port: 9000
     localPort: 9000
+  # pf for app prometheus metrics
+  - resourceType: service
+    resourceName: monodemo-webapp
+    namespace: skaffoldmonodemo
+    port: 4080
+    localPort: 4080
 profiles:
   - name: no-auth
     patches:
