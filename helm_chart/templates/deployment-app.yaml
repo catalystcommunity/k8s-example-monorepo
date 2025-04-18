@@ -41,7 +41,9 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ .Chart.Name }}
+        - name: {{ include "app.name" . }}
+          args:
+            - serve
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.app.image.repository }}:{{ .Values.app.image.tag | default .Chart.AppVersion }}"
@@ -52,7 +54,7 @@ spec:
               protocol: TCP
             {{- if .Values.app.prometheus.enabled }}
             - name: prometheus
-              port: {{ .Values.app.prometheus.port }}
+              containerPort: {{ .Values.app.prometheus.port }}
               protocol: TCP
             {{ end }}
           livenessProbe:
