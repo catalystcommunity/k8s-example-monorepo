@@ -18,10 +18,10 @@ var flags = []cli.Flag{
 	&cli.StringFlag{
 		Name:        "db-uri",
 		Aliases:     []string{"db"},
-		Value:       "postgresql://root:root@service-api-go-cockroachdb:26257?sslmode=disable",
-		Usage:       "The uri to use to connect to cockroachdb",
-		EnvVars:     []string{"COCKROACHDB_URI"},
+		Value:       "postgresql://devuser:devpass@monodemo-postgresql:5432/monodemopg?sslmode=disable",
+		Usage:       "The uri to use to connect to the db",
 		Destination: &config.DbUri,
+		EnvVars:     []string{"DB_URI"},
 	},
 	&cli.IntFlag{
 		Name:        "port",

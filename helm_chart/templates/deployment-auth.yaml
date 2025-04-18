@@ -41,7 +41,7 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ .Chart.Name }}
+        - name: {{ include "auth.name" . }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.auth.image.repository }}:{{ .Values.auth.image.tag | default .Chart.AppVersion }}"
@@ -52,7 +52,7 @@ spec:
               protocol: TCP
             {{- if .Values.auth.prometheus.enabled }}
             - name: prometheus
-              port: {{ .Values.auth.prometheus.port }}
+              containerPort: {{ .Values.auth.prometheus.port }}
               protocol: TCP
             {{ end }}
           livenessProbe:
@@ -81,7 +81,7 @@ spec:
             - name: DB_URI
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "auth.secretName" . }}
+                  name: {{ include "app.secretName" . }}
                   key: DB_URI
       {{- with .Values.nodeSelector }}
       nodeSelector:

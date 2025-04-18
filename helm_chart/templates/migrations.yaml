@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ .Values.migrations.jobName }}
+  name: {{ include "app.migrationJobName" . }}
   labels:
     {{- include "app.labels" . | nindent 4 }}
 spec:
@@ -11,7 +11,7 @@ spec:
   template:
     spec:
       containers:
-        - name: {{ .Chart.Name }}
+        - name: {{ include "app.migrationJobName" . }}
           args:
             - migrate
           securityContext:

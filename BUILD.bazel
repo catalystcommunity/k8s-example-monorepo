@@ -20,6 +20,6 @@ gazelle(
 
 py_library(
     name = "k8s-example-monorepo",
-    srcs = ["web_app/node_modules/flatted/python/flatted.py"],
+    srcs = ["web_client/node_modules/flatted/python/flatted.py"],
     visibility = ["//:__subpackages__"],
 )

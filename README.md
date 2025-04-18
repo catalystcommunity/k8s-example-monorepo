@@ -15,7 +15,7 @@ Several directories will house subprojects, and we'll evolve (and update this re
 - /coredb : All DB related functionality for handling definitions, migrations, etc. Some of this might be generated, much of it not, and it will largely be raw sql files for migrations using `goose` for applying those.
 - /auth_api : A python API built on FastAPI for handling user authentication and authorization needs. It will be production ready.
 - /app_api : The API for whatever app thing we're building, using Go and very little third party dependencies, maybe grpc based if we get to protos.
-- /web_app : A frontend for the web, built in whatever we decide to use for the frontend. Undecided there.
+- /web_client : A frontend for the web, built in whatever we decide to use for the frontend. Undecided there.
 - /cli : A CLI built in Rust for some interactions/tooling, which may be exposed by the root `tools` script or might not. We'll see.
 
 The only assumption is that something else has setup the kubernetes cluster, but it will not care if it's local or public. We'll likely have a `skaffold` workflow for local dev if desired, with several profiles for different use cases like building the webapp locally with just the API running. We will, however, have all the required things to go in k8s and make this a production ready app.

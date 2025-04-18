@@ -74,23 +74,23 @@ Create the name of the service account to use
 */}}
 {{- define "auth.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "auth.name" .) .Values.serviceAccount.name }}
+{{- default (include "auth.name" .) .Values.serviceAccount.name }}{{ "auth" }}
 {{- else }}
-{{- default "default" .Values.serviceAccount.name }}
+{{- default "default" .Values.serviceAccount.name }}{{ "auth" }}
 {{- end }}
 {{- end }}
 {{- define "app.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "app.name" .) .Values.serviceAccount.name }}
+{{- default (include "app.name" .) .Values.serviceAccount.name }}{{ "app" }}
 {{- else }}
-{{- default "default" .Values.serviceAccount.name }}
+{{- default "default" .Values.serviceAccount.name }}{{ "app" }}
 {{- end }}
 {{- end }}
 {{- define "web.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "web.name" .) .Values.serviceAccount.name }}
+{{- default (include "web.name" .) .Values.serviceAccount.name }}{{ "web" }}
 {{- else }}
-{{- default "default" .Values.serviceAccount.name }}
+{{- default "default" .Values.serviceAccount.name }}{{ "web" }}
 {{- end }}
 {{- end }}
 
@@ -105,4 +105,16 @@ Create the name of the secret. Default to the service name, allow overriding.
 {{- end }}
 {{- define "web.secretName" -}}
 {{- default (include "web.name" .) .Values.secretName }}
+{{- end }}
+
+{{/*
+Create migrate job name. For hosted environments, default to the app version.
+This prevents problems with the job's image being immutable.
+*/}}
+{{- define "app.migrationJobName" -}}
+{{- if .Values.migrations.setJobNameAsTimestamp }}
+{{- printf "%s-migrate-%s" .Values.migrations.jobName (now | date "20060102150405") }}
+{{- else }}
+{{- printf "%s-migrate-%s" .Values.migrations.jobName .Chart.AppVersion }}
+{{- end }}
 {{- end }}

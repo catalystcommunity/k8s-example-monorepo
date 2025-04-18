@@ -8,10 +8,10 @@ auth:
   prometheus:
     enabled: false
     path: /metrics
-    port: 9090
+    port: 9000
     latencyHistogramsEnabled: true
   service:
-    type: LoadBalancer
+    type: ClusterIP 
     port: 5080
   autoscaling:
     enabled: true
@@ -42,11 +42,11 @@ app:
   prometheus:
     enabled: false
     path: /metrics
-    port: 9090
+    port: 9000
     latencyHistogramsEnabled: true
   service:
-    type: LoadBalancer
-    port: 5080
+    type: ClusterIP
+    port: 6080
   autoscaling:
     enabled: true
     minReplicas: 1
@@ -63,7 +63,7 @@ web:
     # Overrides the image tag whose default is the chart appVersion
     tag: ""
   service:
-    type: LoadBalancer
+    type: ClusterIP
     port: 4080
   apiUrl: "http://auth-api-service:5080"
   autoscaling:
@@ -88,6 +88,9 @@ migrations:
   jobName: "migrations"
   restartPolicy: "OnFailure"
   resources: {}
+  # Useful if you have to run this a lot, like in a skaffold dev env
+  setJobNameAsTimestamp: false
+  ttlSecondsAfterFinished: 14400 # defaults to a day
 
 grpc:
   maxMessageSizeBytes: "1000000000"
@@ -109,7 +112,7 @@ serviceAccount:
   create: true
   # Annotations to add to the service account
   annotations: {}
-  # The name of the service account to use.
+  # The base name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 

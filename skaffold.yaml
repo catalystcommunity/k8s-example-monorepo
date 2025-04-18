@@ -6,8 +6,8 @@ build:
       context: auth_api/
     - image: app_api
       context: .
-    - image: web_app
-      context: web_app/
+    - image: web_client
+      context: web_client/
   local:
     useDockerCLI: false
     useBuildkit: true
@@ -30,7 +30,9 @@ deploy:
           auth.image.repository: "{{.IMAGE_REPO_auth_api}}"
           auth.image.tag: "{{.IMAGE_TAG_auth_api}}@{{.IMAGE_DIGEST_auth_api}}"
           app.image.repository: "{{.IMAGE_REPO_app_api}}"
-          aoo.image.tag: "{{.IMAGE_TAG_app_api}}@{{.IMAGE_DIGEST_app_api}}"
+          app.image.tag: "{{.IMAGE_TAG_app_api}}@{{.IMAGE_DIGEST_app_api}}"
+          web.image.repository: "{{.IMAGE_REPO_web_client}}"
+          web.image.tag: "{{.IMAGE_TAG_app_api}}@{{.IMAGE_DIGEST_web_client}}"
         valuesFiles:
           - values-skaffold-local.yaml
         recreatePods: true
@@ -44,31 +46,31 @@ portForward:
     localPort: 5432
   # pf for auth server
   - resourceType: service
-    resourceName: monodemo-auth
+    resourceName: monodemoauth
     namespace: skaffoldmonodemo
     port: 5080
     localPort: 5080
   # pf for auth prometheus metrics
   - resourceType: service
-    resourceName: monodemo-auth
+    resourceName: monodemoauth
     namespace: skaffoldmonodemo
     port: 9000
     localPort: 9001
   # pf for app server
   - resourceType: service
-    resourceName: monodemo-api
+    resourceName: monodemoapp
     namespace: skaffoldmonodemo
     port: 6080
     localPort: 6080
   # pf for app prometheus metrics
   - resourceType: service
-    resourceName: monodemo-api
+    resourceName: monodemoapp
     namespace: skaffoldmonodemo
     port: 9000
     localPort: 9000
   # pf for app prometheus metrics
   - resourceType: service
-    resourceName: monodemo-webapp
+    resourceName: monodemoweb
     namespace: skaffoldmonodemo
     port: 4080
     localPort: 4080
@@ -99,6 +101,17 @@ profiles:
         path: /portForward/3
       - op: remove
         path: /portForward/3
+  - name: no-web
+    patches:
+      # disable the app api deployment, so that consumers don't conflict with a
+      # locally running version of the app api
+      - op: add
+        path: /deploy/helm/releases/0/setValues
+        value:
+          web.enabled: false
+          web.autoscaling.enabled: false
+      - op: remove
+        path: /portForward/5
   # test profile that will deploy the app into a "test" namespace. this is
   # useful locally when you want to run tests, but don't want the tests to blow
   # away your local persistent storage.
