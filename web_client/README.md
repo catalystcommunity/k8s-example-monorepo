@@ -7,7 +7,7 @@ A simple React frontend for the K8s Example Monorepo project.
 - React-based SPA (Single Page Application)
 - Authentication flow (login, signup, logout)
 - Integration with auth_api
-- Responsive UI
+- Some basic shells for other views to get started with
 
 ## Development
 
@@ -21,12 +21,14 @@ npm start
 
 ## Environment Variables
 
-- `REACT_APP_API_URL`: URL for API backend (default: 'http://localhost:3001')
+- `REACT_APP_API_URL`: URL for API backend (default: 'http://localhost:4080')
+
+If you run this through the docker image, nginx is the one serving it and you will need a fronting "proxy" to the app/auth APIs. That isn't included.
 
 ## Docker Build
 
 ```bash
-docker build -t k8s-example-web-app .
+docker build -t k8s-example-web-client .
 ```
 
 ## Project Structure

@@ -2,11 +2,17 @@
 
 An example for learning monorepos of some complexity with k8s deployment local and production
 
+## State
+
+This works for the bazel and skaffold flows for build/deployment locally. It's ready for learning. Skaffold will port forward everything to make things easy. There exists no proxy to handle the browser hitting the backend, so you can shift things in the webapp to use a specific URL, but you will need a different URL for auth and app apis. A proxy would make that cleaner, but again, exercise for the reader at the moment.
+
+Short version: It's very ready to learn from.
+
 ## Goals
 
 We wish to have a repository for using in community education efforts around kubernetes and monorepos. This should be applicable to cloud native thinking both for personal projects and for professional applications, and all the building blocks are decoupled enough they can be learned from as a whole while carried forward without the rest.
 
-For example, the auth API will use a backend database with the postgres protocol, but it will only know it is a URL and that protocol, and won't care if it's in the same network, if it's deployed the same, or if it is even really postgres. Same with the other components, where the auth API will not know about the webapp, so if someone were to write a different webapp that used the same API, nothing else should care.
+For example, the auth API will use a backend database with the postgres protocol, but it will only know it is a URL and that protocol, and won't care if it's in the same network, if it's deployed the same, or if it is even really postgres. Same with the other components, where the auth API will not know about the web client, so if someone were to write a different web client that used the same API, nothing else should care.
 
 ## Layout
 
@@ -22,9 +28,9 @@ The only assumption is that something else has setup the kubernetes cluster, but
 
 ## K8s deployables
 
-At the very least we want this to have some options for common production environments. By default the setup will use minimal deployments and to make it "production ready" people will want to specify different values like requests/limits for their services, but we do want to have options for deploying the Grafana/Prometheus/Loki stack for obervability as they are efficient, open source, and very well known in the community.
+At the very least we want this to have some options for common production environments. By default the setup will use minimal deployments and to make it "production ready" people will want to specify different values like requests/limits for their services, but this is already ready for use with the Grafana/Prometheus/Loki. They are well known in the community, but not currently deployed with this setup.
 
-Deployment options will likely be based on helm.
+Deployment is done with helm.
 
 ## Running a test DB
 
@@ -52,6 +58,8 @@ bazel run //:gazelle
 bazel mod tidy
 ```
 
+More info about updating requirements is in the auth_api readme.
+
 ### Bazelisk
 
 We are using Bazel for building and testing. The specific bazel version and setup is managed by `bazelisk`, which is a
@@ -75,10 +83,10 @@ override any settings that you need to change.
 
 ## Contributing
 
-For now, outside contributors need to talk to TodPunk in the [Catalyst Community Discord](https://discord.gg/sfNb9xRjPn) or the [Forge Utah Slack](https://forgeutah.tech) and we may have guides for more self-service options later.
+For now, outside contributors need to talk to TodPunk in the [Catalyst Community Discord](https://discord.gg/sfNb9xRjPn) or the [Forge Utah Slack](https://forgeutah.tech) and we may have guides for more self-service options later. You don't have to contribute to play around locally however you want. Fork and explore!
 
 ## License
 
 We are releasing all of this as MIT Licensed code. We don't care what you do with it, use it for the basis of your startup if you want, or fork pieces and use them to build some open source thing. The point is learning.
 
-Copyright Tod Hansmann
+Copyright Tod Hansmann 2025
